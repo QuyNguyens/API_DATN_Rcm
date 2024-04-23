@@ -1,4 +1,5 @@
 ﻿using BE_Movie_Rcm.Repos.Models;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BE_Movie_Rcm.Modal
@@ -10,11 +11,5 @@ namespace BE_Movie_Rcm.Modal
 
         [Column("Movie_ID")]
         public int? MovieId { get; set; }
-
-        [ForeignKey("MovieId")]
-        public virtual TblMovie? Movie { get; set; }
-
-        [ForeignKey("UserId")]
-        public virtual TblUser? User { get; set; }
     }
 }

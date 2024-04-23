@@ -41,4 +41,25 @@ public partial class TblMovie
 
     [Column("isType")]
     public int? IsType { get; set; }
+
+    [InverseProperty("Movie")]
+    public virtual ICollection<TblActorMovie> TblActorMovies { get; set; } = new List<TblActorMovie>();
+
+    [InverseProperty("Movie")]
+    public virtual ICollection<TblCountryMovie> TblCountryMovies { get; set; } = new List<TblCountryMovie>();
+
+    [InverseProperty("Movie")]
+    public virtual ICollection<TblFavorite> TblFavorites { get; set; } = new List<TblFavorite>();
+
+    [InverseProperty("Movie")]
+    public virtual ICollection<TblGenreMovie> TblGenreMovies { get; set; } = new List<TblGenreMovie>();
+
+    [InverseProperty("Movie")]
+    public virtual ICollection<TblRating> TblRatings { get; set; } = new List<TblRating>();
+
+    [InverseProperty("Movie")]
+    public virtual ICollection<TblStatistic> TblStatistics { get; set; } = new List<TblStatistic>();
+
+    [InverseProperty("Movie")]
+    public virtual ICollection<TblUserMovieAccess> TblUserMovieAccesses { get; set; } = new List<TblUserMovieAccess>();
 }

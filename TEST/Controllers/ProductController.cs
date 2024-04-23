@@ -12,13 +12,13 @@ namespace TEST.Controllers
             this._environment = environment;
         }
 
-        [HttpPut("UploadImage")]
-        public async Task<IActionResult> UploadImage(IFormFile formfile, string productcode) {
+        [HttpPost("UploadImage")]
+        public async Task<IActionResult> UploadImage(IFormFile formfile) {
             ApiReponse reponse = new ApiReponse();
-
+            Guid productcode = Guid.NewGuid();
             try
             {
-                string Filepath = this.GetFilePath(productcode);
+                string Filepath = this.GetFilePath(productcode.ToString());
                 if (!System.IO.Directory.Exists(Filepath))
                 {
                     System.IO.Directory.CreateDirectory(Filepath);
@@ -32,7 +32,7 @@ namespace TEST.Controllers
                 {
                     await formfile.CopyToAsync(stream);
                     reponse.ResponseCode = 200;
-                    reponse.Result = "pass";
+                    reponse.Result = productcode.ToString()+".png";
                 }
             }catch(Exception ex)
             {

@@ -16,4 +16,7 @@ public partial class TblGenre
     [Column("Name_Genre")]
     [StringLength(100)]
     public string? NameGenre { get; set; }
+
+    [InverseProperty("Genre")]
+    public virtual ICollection<TblGenreMovie> TblGenreMovies { get; set; } = new List<TblGenreMovie>();
 }

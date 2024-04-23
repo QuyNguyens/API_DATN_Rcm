@@ -6,10 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BE_Movie_Rcm.Repos.Models;
 
-[Keyless]
 [Table("tbl_genre_movie")]
 public partial class TblGenreMovie
 {
+    [Key]
+    [Column("Genre_MovieID")]
+    public int GenreMovieId { get; set; }
+
     [Column("Movie_ID")]
     public int? MovieId { get; set; }
 
@@ -17,8 +20,10 @@ public partial class TblGenreMovie
     public int? GenreId { get; set; }
 
     [ForeignKey("GenreId")]
+    [InverseProperty("TblGenreMovies")]
     public virtual TblGenre? Genre { get; set; }
 
     [ForeignKey("MovieId")]
+    [InverseProperty("TblGenreMovies")]
     public virtual TblMovie? Movie { get; set; }
 }

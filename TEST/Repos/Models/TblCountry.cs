@@ -16,4 +16,10 @@ public partial class TblCountry
     [Column("Name_Contry")]
     [StringLength(50)]
     public string? NameContry { get; set; }
+
+    [InverseProperty("Country")]
+    public virtual ICollection<TblAccessTime> TblAccessTimes { get; set; } = new List<TblAccessTime>();
+
+    [InverseProperty("Country")]
+    public virtual ICollection<TblCountryMovie> TblCountryMovies { get; set; } = new List<TblCountryMovie>();
 }

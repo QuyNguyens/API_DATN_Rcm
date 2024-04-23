@@ -13,6 +13,9 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using BE_Movie_Rcm.Modal;
 using BE_Movie_Rcm.Repos.Models;
 using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Azure;
+using System.Xml.Linq;
 
 namespace TEST.Controllers
 {
@@ -55,7 +58,21 @@ namespace TEST.Controllers
                 //};
                 //var token = tokenhandler.CreateToken(tokendesc);
                 //var finaltoken = tokenhandler.WriteToken(token);
-                return Ok(user);
+                var _reponse = this._mapper.Map<TblUser, UserResponse>(user);
+                var userSub = await this.context.TblUserSubs.
+                                    Where(item => item.UserId == user.UserId)
+                                    .ToListAsync();
+                var buyVip = await this.context.TblBuyVips.ToListAsync();
+                var _dataBuyVip = this._mapper.Map<List<TblBuyVip>, List<BuyVipModal>>(buyVip);
+
+                _reponse.BuyVips = _dataBuyVip;
+                if(userSub != null)
+                {
+                    var _data = this._mapper.Map<List<TblUserSub>, List<UserSubModal>>(userSub);
+                    _reponse.SubModals = _data;
+                }
+
+                return Ok(_reponse);
                 //return Ok(new TokenResponse() { Token = finaltoken, RefreshToken = await this.refresh.GenerateToken(userCred.username) });
 
             }
@@ -73,7 +90,7 @@ namespace TEST.Controllers
         [HttpPost("register")]
 
         public async Task<IActionResult> Register([FromBody] UserModal userCred)
-            {
+        {
             ApiReponse reponse = new ApiReponse();
             reponse.ResponseCode = 400;
             var userId = await this.context.TblUsers.MaxAsync(item => item.UserId);
@@ -102,5 +119,6 @@ namespace TEST.Controllers
             }
             
         }
+
     }
 }

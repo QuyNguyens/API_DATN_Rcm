@@ -28,13 +28,29 @@ public partial class TblUser
 
     public int? Role { get; set; }
 
-    [Column("Upgrade_status")]
-    public int? UpgradeStatus { get; set; }
-
     [StringLength(10)]
     public string? Phone { get; set; }
 
-    public double? Avatar { get; set; }
+    [StringLength(100)]
+    public string? Avatar { get; set; }
 
     public int? Gender { get; set; }
+
+    [InverseProperty("User")]
+    public virtual ICollection<TblAccessTime> TblAccessTimes { get; set; } = new List<TblAccessTime>();
+
+    [InverseProperty("User")]
+    public virtual ICollection<TblFavorite> TblFavorites { get; set; } = new List<TblFavorite>();
+
+    [InverseProperty("User")]
+    public virtual ICollection<TblRating> TblRatings { get; set; } = new List<TblRating>();
+
+    [InverseProperty("User")]
+    public virtual ICollection<TblStatistic> TblStatistics { get; set; } = new List<TblStatistic>();
+
+    [InverseProperty("User")]
+    public virtual ICollection<TblUserMovieAccess> TblUserMovieAccesses { get; set; } = new List<TblUserMovieAccess>();
+
+    [InverseProperty("User")]
+    public virtual ICollection<TblUserSub> TblUserSubs { get; set; } = new List<TblUserSub>();
 }

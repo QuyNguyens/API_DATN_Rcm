@@ -6,10 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BE_Movie_Rcm.Repos.Models;
 
-[Keyless]
 [Table("tbl_user_subs")]
 public partial class TblUserSub
 {
+    [Key]
+    [Column("User_SubID")]
+    public int UserSubId { get; set; }
+
     [Column("User_ID")]
     public int? UserId { get; set; }
 
@@ -21,6 +24,14 @@ public partial class TblUserSub
 
     public int? Status { get; set; }
 
+    [Column("isType")]
+    public int? IsType { get; set; }
+
+    [ForeignKey("IsType")]
+    [InverseProperty("TblUserSubs")]
+    public virtual TblBuyVip? IsTypeNavigation { get; set; }
+
     [ForeignKey("UserId")]
+    [InverseProperty("TblUserSubs")]
     public virtual TblUser? User { get; set; }
 }

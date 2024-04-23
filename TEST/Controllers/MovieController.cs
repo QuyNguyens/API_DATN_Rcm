@@ -105,9 +105,9 @@ namespace TEST.Controllers
         }
 
         [HttpDelete("delete-history")]
-        public async Task<IActionResult> RemoveHistory(int Id)
+        public async Task<IActionResult> RemoveHistory(int MovieId, int UserId)
         {
-            var data = await this._movieService.RemoveHistory(Id);
+            var data = await this._movieService.RemoveHistory(MovieId, UserId);
             return Ok(data);
         }
 
@@ -137,9 +137,9 @@ namespace TEST.Controllers
         }
 
         [HttpDelete("delete-favorite")]
-        public async Task<IActionResult> RemoveFavorite(int Id)
+        public async Task<IActionResult> RemoveFavorite(int MovieId, int UserId )
         {
-            var data = await this._movieService.RemoveFavorite(Id);
+            var data = await this._movieService.RemoveFavorite(MovieId, UserId);
             return Ok(data);
         }
 
@@ -181,6 +181,48 @@ namespace TEST.Controllers
         {
             var data = await this._movieService.Remove(Id);
             return Ok(data);
+        }
+
+        [HttpPost("create-rating")]
+        public async Task<IActionResult> CreateRating(RatingModal _data)
+        {
+            var data = await this._movieService.Rating(_data);
+            return Ok(data);
+        }
+
+        [HttpGet("get-access-time")]
+        public async Task<IActionResult> GetAccessTime(int userId)
+        {
+            var data = await this._movieService.GetAccessTime(userId);
+            return Ok(data);
+        }
+
+        [HttpPost("create-access-time")]
+        public async Task<IActionResult> CreateAccessTime(AccessTimeModal _data)
+        {
+            var data = await this._movieService.CreateAccessTime(_data);
+            return Ok(data);
+        }
+
+        [HttpPut("update-user-profile")]
+        public async Task<IActionResult> UpdateUserProfile(UserProfile userProfile)
+        {
+            var data = await this._movieService.UpdateUserProfile(userProfile);
+            return Ok(data);
+        }
+
+        [HttpPut("change-user-password")]
+        public async Task<IActionResult> ChangeUserPassword(UserProfile userProfile)
+        {
+            var data = await this._movieService.ChangePasswordUser(userProfile);
+            return Ok(data);
+        }
+
+        [HttpPut("update-buy-vip")]
+        public async Task<IActionResult> UpdateBuyVip(UpdateUserSubModal data)
+        {
+            var _data = await this._movieService.UpdateBuyVip(data);
+            return Ok(_data);
         }
     }
 }

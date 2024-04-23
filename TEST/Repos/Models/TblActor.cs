@@ -21,4 +21,7 @@ public partial class TblActor
     public int? AgeActor { get; set; }
 
     public int? Gender { get; set; }
+
+    [InverseProperty("Actor")]
+    public virtual ICollection<TblActorMovie> TblActorMovies { get; set; } = new List<TblActorMovie>();
 }

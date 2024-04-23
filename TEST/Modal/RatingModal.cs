@@ -12,11 +12,5 @@ namespace BE_Movie_Rcm.Modal
         public int? MovieId { get; set; }
 
         public int? Rating { get; set; }
-
-        [ForeignKey("MovieId")]
-        public virtual TblMovie? Movie { get; set; }
-
-        [ForeignKey("UserId")]
-        public virtual TblUser? User { get; set; }
     }
 }

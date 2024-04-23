@@ -53,12 +53,14 @@ namespace TEST.Service
         /// <returns></returns>
         Task<MovieModal> GetbyId(int Id);
 
+        Task<MovieReponseModal> GetMovieReponse(int Id);
+
         /// <summary>
         /// Get all the movie that user had watched.
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
-        Task<List<MovieModal>> GetHistory(int IdUser);
+        Task<List<MovieReponseModal>> GetHistory(int IdUser);
 
         /// <summary>
         /// Add the movie to history.
@@ -72,7 +74,7 @@ namespace TEST.Service
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
-        Task<ApiReponse> RemoveHistory(int IdMovie);
+        Task<ApiReponse> RemoveHistory(int MovieId, int UserId);
 
         /// <summary>
         /// Remove all the movie that user had watched.
@@ -86,7 +88,7 @@ namespace TEST.Service
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
-        Task<List<MovieModal>> GetFavorite(int IdUser);
+        Task<List<MovieReponseModal>> GetFavorite(int IdUser);
 
         /// <summary>
         /// Add the movie to favorite.
@@ -100,7 +102,7 @@ namespace TEST.Service
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
-        Task<ApiReponse> RemoveFavorite(int IdMovie);
+        Task<ApiReponse> RemoveFavorite(int MovieId, int UserId);
 
         /// <summary>
         /// Remove all the movie that user had favorite.
@@ -131,5 +133,41 @@ namespace TEST.Service
         /// <returns></returns>
         Task<ApiReponse> Update(MovieModal data,int Id);
 
+        /// <summary>
+        /// The Rating movie
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        Task<ApiReponse> Rating(RatingModal data);
+
+        /// <summary>
+        /// Create access time
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        Task<ApiReponse> CreateAccessTime(AccessTimeModal data);
+
+        /// <summary>
+        /// Get Access time
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        Task<AccessTimeResponseModal> GetAccessTime(int userId);
+
+        /// <summary>
+        /// Change user profile
+        /// </summary>
+        /// <param name="userProfile"></param>
+        /// <returns></returns>
+        Task<ApiReponse> UpdateUserProfile(UserProfile userProfile);
+
+        /// <summary>
+        /// change password user
+        /// </summary>
+        /// <param name="userProfile"></param>
+        /// <returns></returns>
+        Task<ApiReponse> ChangePasswordUser(UserProfile userProfile);
+
+        Task<ApiReponse> UpdateBuyVip(UpdateUserSubModal data);
     }
 }

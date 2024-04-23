@@ -16,7 +16,7 @@ namespace BE_Movie_Rcm.Modal
 
         public int? Status { get; set; }
 
-        [ForeignKey("UserId")]
-        public virtual TblUser? User { get; set; }
+        public int? isType { get; set; }
+
     }
 }

@@ -38,7 +38,15 @@ namespace TEST.Container
         public async Task<List<MovieModal>> Getall()
         {
             List<MovieModal> _reponse = new List<MovieModal>();
-            var _data = await this._context.TblMovies.ToListAsync();
+            var _data = await this._context.TblMovies
+                        .Where(movie => movie.IsType == 1)
+                        .Take(18)
+                        .ToListAsync();
+            var _data1 = await this._context.TblMovies
+                        .Where(movie => movie.IsType == 2)
+                        .Take(18)
+                        .ToListAsync();
+            _data.AddRange(_data1);
             if (_data != null)
             {
                 _reponse = this._mapper.Map<List<TblMovie>, List<MovieModal>>(_data);
@@ -140,28 +148,26 @@ namespace TEST.Container
         /// <returns></returns>
         public async Task<List<MovieModal>> GetRecommend(List<string> IdMovie)
         {
-            List<MovieModal> _reponse = new List<MovieModal>();
+            MovieModal _reponse = new MovieModal();
+            List<MovieModal> _reponse1 = new List<MovieModal>();
             var _data = await this._context.TblMovies
                         .Where(movie => IdMovie.Contains(movie.MovieId.ToString()))
                         .ToListAsync();
 
-            var _data1 = await this._context.TblMovies
-                        .Where(movie => movie.IsType == 1)
-                        .Take(18)
-                        .ToListAsync();
-
-            var _data2 = await this._context.TblMovies
-                        .Where(movie => movie.IsType == 2)
-                        .Take(18)
-                        .ToListAsync();
-            _data.AddRange(_data1);
-            _data.AddRange(_data2);
-
             if (_data != null)
             {
-                _reponse = this._mapper.Map<List<TblMovie>, List<MovieModal>>(_data);
+                foreach (var _item in _data)
+                {
+                    var genres = await this._context.TblGenreMovies
+                            .Where(gm => gm.MovieId == _item.MovieId)
+                            .Select(gm => gm.Genre.NameGenre)
+                            .ToListAsync();              
+                    _reponse = this._mapper.Map<TblMovie, MovieModal>(_item);
+                    _reponse.Genres = genres;
+                    _reponse1.Add(_reponse);
+                }
             }
-            return _reponse;
+            return _reponse1;
         }
 
         /// <summary>
@@ -169,22 +175,21 @@ namespace TEST.Container
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
-        public async Task<List<MovieModal>> GetHistory(int IdUser)
+        public async Task<List<MovieReponseModal>> GetHistory(int IdUser)
         {
             var _data = await this._context.TblUserMovieAccesses
                         .Where(user => user.UserId == IdUser)
                         .ToListAsync();
             if (_data != null)
             {
-                List<MovieModal> _response = new List<MovieModal>();
+                List<MovieReponseModal> _response = new List<MovieReponseModal>();
 
                 foreach (var access in _data)
                 {
                     var movies = await this._context.TblMovies
                                         .Where(movie => movie.MovieId == access.MovieId)
                                         .ToListAsync();
-
-                    _response.AddRange((this._mapper.Map<List<TblMovie>, List<MovieModal>>(movies)));
+                    _response.AddRange((this._mapper.Map<List<TblMovie>, List<MovieReponseModal>>(movies)));
                 }
                 return _response;
             }
@@ -193,7 +198,15 @@ namespace TEST.Container
 
         public async Task<ApiReponse> AddHistory(MovieAccessModal data)
         {
-            ApiReponse reponse = new ApiReponse();
+            ApiReponse reponse = new ApiReponse();          
+            var _data = await this._context.TblUserMovieAccesses
+                        .Where(access => access.UserId == data.UserId && access.MovieId == data.MovieId)
+                        .FirstOrDefaultAsync();
+            if (_data != null)
+            {
+                reponse.ErroreMessage = "already add in your history";
+                return reponse;
+            }
             try
             {
                 TblUserMovieAccess _movie = this._mapper.Map<MovieAccessModal, TblUserMovieAccess>(data);
@@ -210,18 +223,20 @@ namespace TEST.Container
             return reponse;
         }
 
-        public async Task<ApiReponse> RemoveHistory(int Id)
+        public async Task<ApiReponse> RemoveHistory(int MovieId, int UserId)
         {
             ApiReponse reponse = new ApiReponse();
             try
             {
-                var _movie = await this._context.TblUserMovieAccesses.FindAsync(Id);
+                var _movie = this._context.TblUserMovieAccesses
+                             .Where(access => access.MovieId == MovieId && access.UserId == UserId)
+                             .FirstOrDefault();
                 if (_movie != null)
                 {
                     this._context.TblUserMovieAccesses.Remove(_movie);
                     await this._context.SaveChangesAsync();
                     reponse.ResponseCode = 200;
-                    reponse.Result = Id.ToString();
+                    reponse.Result = MovieId.ToString();
                 }
                 else
                 {
@@ -269,22 +284,21 @@ namespace TEST.Container
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
-        public async Task<List<MovieModal>> GetFavorite(int Id)
+        public async Task<List<MovieReponseModal>> GetFavorite(int IdUser)
         {
             var _data = await this._context.TblFavorites
-                        .Where(user => user.UserId == Id)
+                        .Where(user => user.UserId == IdUser)
                         .ToListAsync();
             if (_data != null)
             {
-                List<MovieModal> _response = new List<MovieModal>();
+                List<MovieReponseModal> _response = new List<MovieReponseModal>();
 
                 foreach (var access in _data)
                 {
                     var movies = await this._context.TblMovies
                                         .Where(movie => movie.MovieId == access.MovieId)
                                         .ToListAsync();
-
-                    _response.AddRange((this._mapper.Map<List<TblMovie>, List<MovieModal>>(movies)));
+                    _response.AddRange((this._mapper.Map<List<TblMovie>, List<MovieReponseModal>>(movies)));
                 }
                 return _response;
             }
@@ -294,6 +308,15 @@ namespace TEST.Container
         public async Task<ApiReponse> AddFavorite(FavoriteModal data)
         {
             ApiReponse reponse = new ApiReponse();
+    
+            var _data = await this._context.TblFavorites
+                        .Where(access => access.UserId == data.UserId && access.MovieId == data.MovieId)
+                        .FirstOrDefaultAsync();
+            if (_data != null)
+            {
+                reponse.ErroreMessage = "already add in your favorite";
+                return reponse;
+            }
             try
             {
                 TblFavorite _movie = this._mapper.Map<FavoriteModal, TblFavorite>(data);
@@ -310,18 +333,20 @@ namespace TEST.Container
             return reponse;
         }
 
-        public async Task<ApiReponse> RemoveFavorite(int Id)
+        public async Task<ApiReponse> RemoveFavorite(int MovieId,int UserId)
         {
             ApiReponse reponse = new ApiReponse();
             try
             {
-                var _movie = await this._context.TblFavorites.FindAsync(Id);
+                var _movie = this._context.TblFavorites
+                             .Where(access => access.MovieId == MovieId && access.UserId == UserId)
+                             .FirstOrDefault();
                 if (_movie != null)
                 {
                     this._context.TblFavorites.Remove(_movie);
                     await this._context.SaveChangesAsync();
                     reponse.ResponseCode = 200;
-                    reponse.Result = Id.ToString();
+                    reponse.Result = MovieId.ToString();
                 }
                 else
                 {
@@ -363,6 +388,18 @@ namespace TEST.Container
             }
             return reponse;
         }
+        
+        public async Task<MovieReponseModal> GetMovieReponse(int Id)
+        {
+            MovieReponseModal _reponse = new MovieReponseModal();
+            var _data = await this._context.TblMovies.FindAsync(Id);
+            if (_data != null)
+            {
+                _reponse = this._mapper.Map<TblMovie, MovieReponseModal>(_data);
+            }
+            return _reponse;
+        }
+
         /// <summary>
         /// Get movie by Id
         /// </summary>
@@ -492,5 +529,174 @@ namespace TEST.Container
             return reponse;
         }
 
+        /// <summary>
+        /// Rating the movie
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ApiReponse> Rating(RatingModal data)
+        {
+            ApiReponse reponse = new ApiReponse();
+
+            var _data = this._context.TblRatings
+                        .Where(movie => movie.MovieId == data.MovieId && movie.UserId == data.UserId)
+                        .FirstOrDefault();
+            if(_data != null )
+            {
+                _data.Rating = data.Rating;
+                await this._context.SaveChangesAsync();
+                reponse.ResponseCode = 200;
+                reponse.Result = data.MovieId.ToString();
+            }
+            else
+            {
+                TblRating _rating = this._mapper.Map<RatingModal, TblRating>(data);
+                await this._context.TblRatings.AddAsync(_rating);
+                await this._context.SaveChangesAsync();
+                reponse.ResponseCode = 201;
+                reponse.Result = data.MovieId.ToString();
+            }
+
+            return reponse;
+        }
+
+        public async Task<ApiReponse> CreateAccessTime(AccessTimeModal data)
+        {
+            ApiReponse reponse = new ApiReponse();
+            try
+            {
+                TblAccessTime _access = this._mapper.Map<AccessTimeModal, TblAccessTime>(data);
+                await this._context.TblAccessTimes.AddAsync(_access);
+                await this._context.SaveChangesAsync();
+                reponse.ResponseCode = 201;
+                reponse.Result = data.AccessTime.ToString();
+            }
+            catch (Exception ex)
+            {
+                reponse.ResponseCode = 400;
+                reponse.ErroreMessage = ex.Message;
+            }
+            return reponse;
+        }
+
+        public async Task<AccessTimeResponseModal> GetAccessTime(int userId)
+        {
+            var _data = await this._context.TblAccessTimes.Where(user => user.UserId == userId)
+                .OrderByDescending(t => t.AccessTime)
+                .Take(5)
+                .ToListAsync();
+            var _idCountry = _data.Select(p => p.CountryId).ToList();
+            var _accesstime = _data.Select(t => t.AccessTime).ToList();
+            var _country = _idCountry
+                            .Select(id => this._context.TblCountries.FirstOrDefault(country => country.CountryId == id)?.NameContry)
+                            .ToList();
+            AccessTimeResponseModal _reponse = new AccessTimeResponseModal
+            {
+                country = _country!,
+                accessTime = _accesstime
+            };
+            return _reponse;
+        }
+
+        public async Task<ApiReponse> UpdateUserProfile(UserProfile userProfile)
+        {
+            ApiReponse reponse = new ApiReponse();
+            try
+            {
+                var _user = await this._context.TblUsers.FindAsync(userProfile.userId);
+                if (_user != null)
+                {
+                    _user.UserName = userProfile.userName;
+                    _user.Phone = userProfile.phone;
+                    _user.Avatar = userProfile.avatar;
+                    _user.Gender = userProfile.gender;
+
+                    await this._context.SaveChangesAsync();
+                    reponse.ResponseCode = 200;
+                    reponse.Result = userProfile.userId.ToString();
+                }
+                else
+                {
+                    reponse.ResponseCode = 404;
+                    reponse.ErroreMessage = "Data not found";
+                }
+            }
+            catch (Exception ex)
+            {
+                reponse.ResponseCode = 400;
+                reponse.ErroreMessage = ex.Message;
+            }
+            return reponse;
+        }
+
+        public async Task<ApiReponse> ChangePasswordUser(UserProfile userProfile)
+        {
+            ApiReponse reponse = new ApiReponse();
+            try
+            {
+                var _user = await this._context.TblUsers.FindAsync(userProfile.userId);
+                if (_user != null)
+                {
+                    _user.Password = userProfile.newPassword;
+
+                    await this._context.SaveChangesAsync();
+                    reponse.ResponseCode = 200;
+                    reponse.Result = userProfile.userId.ToString();
+                }
+                else
+                {
+                    reponse.ResponseCode = 404;
+                    reponse.ErroreMessage = "Data not found";
+                }
+            }
+            catch (Exception ex)
+            {
+                reponse.ResponseCode = 400;
+                reponse.ErroreMessage = ex.Message;
+            }
+            return reponse;
+        }
+
+        public async Task<ApiReponse> UpdateBuyVip(UpdateUserSubModal data)
+        {
+            ApiReponse reponse = new ApiReponse();
+            try
+            {
+                if(data.status == 0)
+                {
+                    UserSubModal userSubModal = new UserSubModal()
+                    {
+                        UserId = data.userId,
+                        Status = 1,
+                        isType = data.isType,
+                        StartDay = DateTime.Now,
+                        EndDay = DateTime.Now,
+                    };
+                    TblUserSub _userSub = this._mapper.Map<UserSubModal, TblUserSub>(userSubModal);
+                    await this._context.TblUserSubs.AddAsync(_userSub);
+                    await this._context.SaveChangesAsync();
+                }
+                else
+                {
+                    var _data = await this._context.TblUserSubs.
+                                Where(item => item.IsType == data.isType && item.UserId == data.userId)
+                                .FirstOrDefaultAsync();
+                    if(_data != null)
+                    {
+                        _data.Status = 2;
+                        await this._context.SaveChangesAsync();
+                    }
+                }
+                reponse.ResponseCode = 200;
+                reponse.Result = data.isType.ToString();
+            }
+            catch (Exception ex)
+            {
+                reponse.ResponseCode = 400;
+                reponse.ErroreMessage = ex.Message;
+            }
+            return reponse;
+        }
     }
 }
