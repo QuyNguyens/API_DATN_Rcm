@@ -54,9 +54,9 @@ public partial class MovieDataContext : DbContext
     {
         modelBuilder.Entity<TblAccessTime>(entity =>
         {
-            entity.HasKey(e => e.AccessTimeId).HasName("PK__tbl_acce__438552FA101B4A56");
+            entity.HasKey(e => e.AccessTimeId).HasName("PK__tbl_acce__438552FA7F510D3C");
 
-            entity.HasOne(d => d.Country).WithMany(p => p.TblAccessTimes).HasConstraintName("FK_access_time_country");
+            entity.HasOne(d => d.Country).WithMany(p => p.TblAccessTimes).HasConstraintName("FK_Country_access_time");
 
             entity.HasOne(d => d.User).WithMany(p => p.TblAccessTimes).HasConstraintName("FK_access_time");
         });
@@ -84,14 +84,12 @@ public partial class MovieDataContext : DbContext
 
         modelBuilder.Entity<TblCountry>(entity =>
         {
-            entity.HasKey(e => e.CountryId).HasName("PK__tbl_coun__8036CB4EBEA57274");
-
-            entity.Property(e => e.CountryId).ValueGeneratedNever();
+            entity.HasKey(e => e.CountryId).HasName("PK__tbl_coun__8036CB4E4C907968");
         });
 
         modelBuilder.Entity<TblCountryMovie>(entity =>
         {
-            entity.HasKey(e => e.CountryMovieId).HasName("PK__tbl_coun__0F96CA8102AB0B2A");
+            entity.HasKey(e => e.CountryMovieId).HasName("PK__tbl_coun__0F96CA818F4EFB17");
 
             entity.HasOne(d => d.Country).WithMany(p => p.TblCountryMovies).HasConstraintName("FK_Country_Movie");
 

@@ -17,7 +17,8 @@ public partial class TblAccessTime
     public int? UserId { get; set; }
 
     [Column("Country_ID")]
-    public int? CountryId { get; set; }
+    [StringLength(15)]
+    public string? CountryId { get; set; }
 
     [Column("Access_time")]
     public int? AccessTime { get; set; }

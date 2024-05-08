@@ -11,7 +11,8 @@ public partial class TblCountry
 {
     [Key]
     [Column("Country_ID")]
-    public int CountryId { get; set; }
+    [StringLength(15)]
+    public string CountryId { get; set; } = null!;
 
     [Column("Name_Contry")]
     [StringLength(50)]

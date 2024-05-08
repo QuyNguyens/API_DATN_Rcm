@@ -21,6 +21,12 @@ namespace TEST.Helper
             CreateMap<TblRating, RatingModal>().ReverseMap();
             CreateMap<TblAccessTime, AccessTimeModal>().ReverseMap();
             CreateMap<TblBuyVip, BuyVipModal>().ReverseMap();
+            CreateMap<TblUser, UserAdminModal>().ReverseMap();
+            CreateMap<TblUserSub, BuyVipResponseModal>().ReverseMap();
+            CreateMap<TblActor, ActorModal>().ReverseMap();
+
+
+
 
 
         }

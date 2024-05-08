@@ -6,5 +6,7 @@ namespace BE_Movie_Rcm.Modal
     {
         public List<string>? country { get; set; }
         public List<int?>? accessTime { get; set; }
+        public List<AccessTimeModal> countUser { get; set; }
+        public List<AccessTimeModal> sumAccessTime { get; set; }
     }
 }

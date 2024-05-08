@@ -20,7 +20,6 @@ public partial class TblActorMovie
     public int? ActorId { get; set; }
 
     [Column("role")]
-    [StringLength(100)]
     public string? Role { get; set; }
 
     [ForeignKey("ActorId")]

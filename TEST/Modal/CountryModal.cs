@@ -8,7 +8,7 @@ namespace BE_Movie_Rcm.Modal
     {
         [Key]
         [Column("Country_ID")]
-        public int CountryId { get; set; }
+        public string? CountryId { get; set; }
 
         [Column("Name_Contry")]
         [StringLength(50)]

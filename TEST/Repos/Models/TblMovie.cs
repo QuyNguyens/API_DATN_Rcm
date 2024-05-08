@@ -13,7 +13,6 @@ public partial class TblMovie
     [Column("Movie_ID")]
     public int MovieId { get; set; }
 
-    [StringLength(100)]
     public string? Title { get; set; }
 
     public string? Descriptions { get; set; }

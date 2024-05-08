@@ -31,7 +31,7 @@ namespace TEST.Service
         /// </summary>
         /// <param name="IdMovie"></param>
         /// <returns></returns>
-        Task<List<MovieModal>> GetRecommend(List<string> IdMovie);
+        Task<List<MovieModal>> GetRecommend(List<int> IdMovie);
 
         /// <summary>
         /// Get all the movie by Genre
@@ -131,7 +131,7 @@ namespace TEST.Service
         /// <param name="data"></param>
         /// <param name="Id"></param>
         /// <returns></returns>
-        Task<ApiReponse> Update(MovieModal data,int Id);
+        Task<ApiReponse> Update(MovieCreateModal data);
 
         /// <summary>
         /// The Rating movie
@@ -168,6 +168,19 @@ namespace TEST.Service
         /// <returns></returns>
         Task<ApiReponse> ChangePasswordUser(UserProfile userProfile);
 
-        Task<ApiReponse> UpdateBuyVip(UpdateUserSubModal data);
+        /// <summary>
+        /// buy the prenium
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        Task<BuyVipResponseModal> UpdateBuyVip(UpdateUserSubModal data);
+
+        Task<AccessTimeResponseModal> GetGroupCountry();
+
+        Task<MovieAdminResponseModal> GetMovieAdmin();
+
+        Task<UserAdminResponseModal> CountUser();
+
+        Task<UserSubAdminResponse> CountUserSubs();
     }
 }

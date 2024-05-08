@@ -28,10 +28,9 @@ public partial class TblUser
 
     public int? Role { get; set; }
 
-    [StringLength(10)]
+    [StringLength(15)]
     public string? Phone { get; set; }
 
-    [StringLength(100)]
     public string? Avatar { get; set; }
 
     public int? Gender { get; set; }

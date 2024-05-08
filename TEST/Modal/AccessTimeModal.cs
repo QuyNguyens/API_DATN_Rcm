@@ -8,9 +8,12 @@ namespace BE_Movie_Rcm.Modal
         public int? UserId { get; set; }
 
         [Column("Country_ID")]
-        public int? CountryId { get; set; }
+        public string? CountryId { get; set; }
 
         [Column("Access_time")]
         public int? AccessTime { get; set; }
+
+        public string nameCountry { get; set; }
+
     }
 }

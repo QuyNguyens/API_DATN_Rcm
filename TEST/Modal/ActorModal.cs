@@ -11,11 +11,13 @@ namespace BE_Movie_Rcm.Modal
 
         [Column("Name_Actor")]
         [StringLength(100)]
-        public string? NameActor { get; set; }
+        public string NameActor { get; set; }
 
         [Column("Age_Actor")]
-        public int? AgeActor { get; set; }
+        public int AgeActor { get; set; }
 
-        public int? Gender { get; set; }
+        public int Gender { get; set; }
+
+        public string Role { get; set; }
     }
 }

@@ -67,7 +67,7 @@ namespace TEST.Container
                         .Select(ctry => ctry.CountryId)
                         .ToListAsync();
             var movies = await this._context.TblCountryMovies
-                        .Where(ctry => countrys.Contains((int)ctry.CountryId))
+                        .Where(ctry => countrys.Contains(ctry.CountryId))
                         .Select(ctry => ctry.MovieId)
                         .ToListAsync();
 
@@ -90,7 +90,7 @@ namespace TEST.Container
         public async Task<List<CountryModal>> GetlistCountry()
         {
             List<CountryModal> _reponse = new List<CountryModal>();
-            var _data = await this._context.TblCountries.ToListAsync();
+            var _data = await this._context.TblCountries.Take(12).ToListAsync();
             if (_data != null)
             {
                 _reponse = this._mapper.Map<List<TblCountry>, List<CountryModal>>(_data);
@@ -133,7 +133,7 @@ namespace TEST.Container
         public async Task<List<GenreModal>> GetlistGenre()
         {
             List<GenreModal> _reponse = new List<GenreModal>();
-            var _data = await this._context.TblGenres.ToListAsync();
+            var _data = await this._context.TblGenres.Take(12).ToListAsync();
             if (_data != null)
             {
                 _reponse = this._mapper.Map<List<TblGenre>, List<GenreModal>>(_data);
@@ -146,12 +146,12 @@ namespace TEST.Container
         /// </summary>
         /// <param name="IdMovie"></param>
         /// <returns></returns>
-        public async Task<List<MovieModal>> GetRecommend(List<string> IdMovie)
+        public async Task<List<MovieModal>> GetRecommend(List<int> IdMovie)
         {
             MovieModal _reponse = new MovieModal();
             List<MovieModal> _reponse1 = new List<MovieModal>();
             var _data = await this._context.TblMovies
-                        .Where(movie => IdMovie.Contains(movie.MovieId.ToString()))
+                        .Where(movie => IdMovie.Contains(movie.MovieId))
                         .ToListAsync();
 
             if (_data != null)
@@ -161,7 +161,8 @@ namespace TEST.Container
                     var genres = await this._context.TblGenreMovies
                             .Where(gm => gm.MovieId == _item.MovieId)
                             .Select(gm => gm.Genre.NameGenre)
-                            .ToListAsync();              
+                            .ToListAsync();
+
                     _reponse = this._mapper.Map<TblMovie, MovieModal>(_item);
                     _reponse.Genres = genres;
                     _reponse1.Add(_reponse);
@@ -411,15 +412,22 @@ namespace TEST.Container
                         .Where(gm => gm.MovieId == Id)
                         .Select(gm => gm.Genre.NameGenre)
                         .ToListAsync();
-            var actor = await this._context.TblActorMovies
-
-                        .Where (actor => actor.MovieId == Id)
-                        .Select (actor => actor.Actor)
-                        .ToListAsync();
+            var actor = (from actor1 in this._context.TblActors
+                         join actorMovie in this._context.TblActorMovies on actor1.ActorId equals actorMovie.ActorId into actorGroup
+                         select new ActorModal
+                         {
+                             NameActor = actor1.NameActor,
+                             Role = actorGroup.FirstOrDefault().Role,
+                         })
+                    .Take(6
+                    )
+                    .ToList();
             var country = await this._context.TblCountryMovies
-
                         .Where(ctry => ctry.MovieId == Id)
-                        .Select(ctry => ctry.Country.NameContry)
+                        .Select(ctry =>  new CountryModal() { 
+                            CountryId = ctry.CountryId,
+                            NameContry = ctry.Country.NameContry
+                        })
                         .ToListAsync();
             MovieModal _reponse = new MovieModal();
             var _data = await this._context.TblMovies.FindAsync(Id);          
@@ -442,13 +450,15 @@ namespace TEST.Container
         public async Task<ApiReponse> Create(MovieCreateModal data)
         {
             ApiReponse reponse = new ApiReponse();
+            var _id = this._context.TblMovies.Max(movie => movie.MovieId);
+            data.MovieId = _id+1;
             try
             {
                 TblMovie _movie = this._mapper.Map<MovieCreateModal, TblMovie>(data);
                 await this._context.TblMovies.AddAsync(_movie);
                 await this._context.SaveChangesAsync();
                 reponse.ResponseCode = 201;
-                reponse.Result = data.MovieId.ToString();
+                reponse.Result = "Oke";
             }
             catch (Exception ex)
             {
@@ -495,25 +505,23 @@ namespace TEST.Container
         /// <param name="data"></param>
         /// <param name="Id"></param>
         /// <returns></returns>
-        public async Task<ApiReponse> Update(MovieModal data, int Id)
+        public async Task<ApiReponse> Update(MovieCreateModal data)
         {
             ApiReponse reponse = new ApiReponse();
             try
             {
-                var _movie = await this._context.TblMovies.FindAsync(Id);
+                var _movie = await this._context.TblMovies.FindAsync(data.MovieId);
                 if (_movie != null)
                 {
                     _movie.Title = data.Title;
-                    _movie.Status = data.Status;
                     _movie.Poster = data.Poster;
                     _movie.Descriptions = data.Descriptions;
                     _movie.Urls = data.Urls;
-                    _movie.VoteCount = data.VoteCount;
-                    _movie.VoteAverage = data.VoteAverage;
                     _movie.OriginalLanguage = data.OriginalLanguage;
+                    _movie.IsType = data.IsType;
                     await this._context.SaveChangesAsync();
                     reponse.ResponseCode = 200;
-                    reponse.Result = Id.ToString();
+                    reponse.Result = data.MovieId.ToString();
                 }
                 else
                 {
@@ -564,24 +572,35 @@ namespace TEST.Container
         public async Task<ApiReponse> CreateAccessTime(AccessTimeModal data)
         {
             ApiReponse reponse = new ApiReponse();
-            try
+            var dataFind = this._context.TblAccessTimes.Where(mv => mv.UserId == data.UserId && mv.CountryId == data.CountryId).FirstOrDefault();
+            if(dataFind != null)
             {
-                TblAccessTime _access = this._mapper.Map<AccessTimeModal, TblAccessTime>(data);
-                await this._context.TblAccessTimes.AddAsync(_access);
+                dataFind.AccessTime = dataFind.AccessTime + data.AccessTime;
                 await this._context.SaveChangesAsync();
                 reponse.ResponseCode = 201;
                 reponse.Result = data.AccessTime.ToString();
             }
-            catch (Exception ex)
+            else
             {
-                reponse.ResponseCode = 400;
-                reponse.ErroreMessage = ex.Message;
+                try
+                {
+                    TblAccessTime _access = this._mapper.Map<AccessTimeModal, TblAccessTime>(data);
+                    await this._context.TblAccessTimes.AddAsync(_access);
+                    await this._context.SaveChangesAsync();
+                    reponse.ResponseCode = 201;
+                    reponse.Result = data.AccessTime.ToString();
+                }
+                catch (Exception ex)
+                {
+                    reponse.ResponseCode = 400;
+                    reponse.ErroreMessage = ex.Message;
+                }
             }
             return reponse;
         }
 
         public async Task<AccessTimeResponseModal> GetAccessTime(int userId)
-        {
+            {
             var _data = await this._context.TblAccessTimes.Where(user => user.UserId == userId)
                 .OrderByDescending(t => t.AccessTime)
                 .Take(5)
@@ -658,9 +677,9 @@ namespace TEST.Container
             return reponse;
         }
 
-        public async Task<ApiReponse> UpdateBuyVip(UpdateUserSubModal data)
+        public async Task<BuyVipResponseModal> UpdateBuyVip(UpdateUserSubModal data)
         {
-            ApiReponse reponse = new ApiReponse();
+            BuyVipResponseModal reponse = new BuyVipResponseModal();
             try
             {
                 if(data.status == 0)
@@ -684,19 +703,109 @@ namespace TEST.Container
                                 .FirstOrDefaultAsync();
                     if(_data != null)
                     {
+                        int day = 0;
+                        switch (data.isType)
+                        {
+                            case 1:
+                            case 4:
+                                day = 30; break;                             
+                            case 2:
+                                day = 90; break;                               
+                            case 3:
+                                day = 365; break;
+                        }
                         _data.Status = 2;
+                        _data.StartDay = DateTime.Now;
+                        _data.EndDay = DateTime.Now.AddDays(day);
                         await this._context.SaveChangesAsync();
+                        reponse.StartDay = DateTime.Now;
+                        reponse.EndDay = DateTime.Now.AddDays(day);
                     }
                 }
-                reponse.ResponseCode = 200;
-                reponse.Result = data.isType.ToString();
+                
             }
             catch (Exception ex)
             {
-                reponse.ResponseCode = 400;
-                reponse.ErroreMessage = ex.Message;
+                reponse.StartDay = DateTime.Now;
+                reponse.EndDay = DateTime.Now;
             }
             return reponse;
+        }
+
+        public async Task<AccessTimeResponseModal> GetGroupCountry()
+        {
+            var accessTimeModalList = (from accessTime in this._context.TblCountries
+                                       join country in this._context.TblAccessTimes on accessTime.CountryId equals country.CountryId into countryAccessGroup
+                                       select new AccessTimeModal
+                                       {
+                                           CountryId = accessTime.CountryId,
+                                           nameCountry = countryAccessGroup.FirstOrDefault().Country.NameContry, // Assuming at least one country record per CountryId
+                                           AccessTime = countryAccessGroup.Sum(item => item.AccessTime ?? 0) // Handle null AccessTime
+                                       })
+                                       .OrderByDescending(item => item.AccessTime)
+                                       .Take(7)
+                           .ToList();
+
+            var countryAccessData = from country in this._context.TblCountries
+                                    join accessTime in this._context.TblAccessTimes on country.CountryId equals accessTime.CountryId into countryAccessGroup
+                                    select new AccessTimeModal
+                                    {
+                                        CountryId = country.CountryId,
+                                        nameCountry = country.NameContry,
+                                        AccessTime = countryAccessGroup.Count()
+                                    };
+            var newDataCountry = countryAccessData.OrderByDescending(item => item.AccessTime).Take(7).ToList();
+            AccessTimeResponseModal reponse = new AccessTimeResponseModal()
+            {
+                countUser = newDataCountry,
+                sumAccessTime = accessTimeModalList
+            };
+            return reponse;
+        }
+
+        public async Task<MovieAdminResponseModal> GetMovieAdmin()
+        {
+            MovieAdminResponseModal _responce = new MovieAdminResponseModal();
+
+            var amount = this._context.TblMovies.Count();
+            List<MovieModal> listMovie = new List<MovieModal>();
+
+            var _data = this._context.TblMovies.Take(40).ToList();
+            listMovie = this._mapper.Map<List<TblMovie>, List<MovieModal>>(_data);
+
+            _responce.Amount = amount;
+            _responce.ListMovie = listMovie;
+            return _responce;
+        }
+
+        public async Task<UserAdminResponseModal> CountUser()
+        {
+            UserAdminResponseModal _responce = new UserAdminResponseModal();
+
+            var amount = this._context.TblUsers.Count();
+            List<UserAdminModal> listUser = new List<UserAdminModal>();
+
+            var _data = this._context.TblUsers.Take(40).ToList();
+            listUser = this._mapper.Map<List<TblUser>, List<UserAdminModal> >(_data);
+
+            _responce.Amount = amount;
+            _responce.ListUser = listUser;
+            return _responce;
+        }
+
+        public async Task<UserSubAdminResponse> CountUserSubs()
+        {
+            UserSubAdminResponse _responce = new UserSubAdminResponse();
+
+            var amount = this._context.TblUserSubs.Where(user => user.Status == 1).Count();
+            List<UserSubModal> listUser = new List<UserSubModal>();
+
+            var _data = this._context.TblUserSubs.ToList();
+            listUser = this._mapper.Map<List<TblUserSub>, List<UserSubModal>>(_data);
+
+            _responce.Amount = amount;
+            _responce.ListUserSubs = listUser;
+            return _responce;
         }
     }
 }

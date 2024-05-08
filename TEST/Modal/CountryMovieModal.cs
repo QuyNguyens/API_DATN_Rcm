@@ -14,7 +14,7 @@ namespace BE_Movie_Rcm.Modal
         public int? MovieId { get; set; }
 
         [Column("Country_ID")]
-        public int? CountryId { get; set; }
+        public string? CountryId { get; set; }
 
         [ForeignKey("CountryId")]
         [InverseProperty("TblCountryMovies")]

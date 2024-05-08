@@ -120,5 +120,18 @@ namespace TEST.Controllers
             
         }
 
+        [HttpDelete("delete-user")]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            var _user = await this.context.TblUsers.FirstOrDefaultAsync(user => user.UserId == id);
+
+            if(_user != null)
+            {
+                this.context.TblUsers.Remove(_user);
+                await this.context.SaveChangesAsync ();
+                return Ok();
+            }
+            return NotFound();
+        }
     }
 }

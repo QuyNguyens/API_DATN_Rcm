@@ -17,7 +17,8 @@ public partial class TblCountryMovie
     public int? MovieId { get; set; }
 
     [Column("Country_ID")]
-    public int? CountryId { get; set; }
+    [StringLength(15)]
+    public string? CountryId { get; set; }
 
     [ForeignKey("CountryId")]
     [InverseProperty("TblCountryMovies")]

@@ -76,7 +76,7 @@ namespace TEST.Controllers
         }
 
         [HttpPost("get-movie-recommend")]
-        public async Task<IActionResult> GetRecommend(List<string> IdMovie)
+        public async Task<IActionResult> GetRecommend(List<int> IdMovie)
         {
             var data = await this._movieService.GetRecommend(IdMovie);
             if (data == null)
@@ -170,9 +170,9 @@ namespace TEST.Controllers
         }
 
         [HttpPut("update-movie")]
-        public async Task<IActionResult> Update(MovieModal _data,int Id)
+        public async Task<IActionResult> Update(MovieCreateModal _data)
         {
-            var data = await this._movieService.Update(_data,Id);
+            var data = await this._movieService.Update(_data);
             return Ok(data);
         }
 
@@ -222,6 +222,34 @@ namespace TEST.Controllers
         public async Task<IActionResult> UpdateBuyVip(UpdateUserSubModal data)
         {
             var _data = await this._movieService.UpdateBuyVip(data);
+            return Ok(_data);
+        }
+
+        [HttpGet("get-group-country")]
+        public async Task<IActionResult> GetGroupCountry()
+        {
+            var _data = await this._movieService.GetGroupCountry();
+            return Ok(_data);
+        }
+
+        [HttpGet("get-movie-admin")]
+        public async Task<IActionResult> GetMovieAdmin()
+        {
+            var _data = await this._movieService.GetMovieAdmin();
+            return Ok(_data);
+        }
+
+        [HttpGet("get-user-admin")]
+        public async Task<IActionResult> CountUser()
+        {
+            var _data = await this._movieService.CountUser();
+            return Ok(_data);
+        }
+
+        [HttpGet("get-user-subs-admin")]
+        public async Task<IActionResult> CountUserSubs()
+        {
+            var _data = await this._movieService.CountUserSubs();
             return Ok(_data);
         }
     }
