@@ -12,6 +12,7 @@ using System.Collections;
 using System.Diagnostics.Metrics;
 using BE_Movie_Rcm.Modal;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Xml.Linq;
 
 namespace TEST.Container
 {
@@ -142,7 +143,7 @@ namespace TEST.Container
         }
 
         /// <summary>
-        /// Get movie by recommend
+        /// Get movie by    end
         /// </summary>
         /// <param name="IdMovie"></param>
         /// <returns></returns>
@@ -767,7 +768,8 @@ namespace TEST.Container
         {
             MovieAdminResponseModal _responce = new MovieAdminResponseModal();
 
-            var amount = this._context.TblMovies.Count();
+            //var amount = await this._context.TblMovies.CountAsync();
+            int amount = 45300;
             List<MovieModal> listMovie = new List<MovieModal>();
 
             var _data = this._context.TblMovies.Take(40).ToList();
@@ -806,6 +808,18 @@ namespace TEST.Container
             _responce.Amount = amount;
             _responce.ListUserSubs = listUser;
             return _responce;
+        }
+
+        public async Task<List<MovieReponseModal>> GetVoteMovieAdm()
+        {
+            var topMovies = await this._context.TblMovies
+                        .Where(m => m.VoteCount > 1000)
+                        .Take(7)
+                        .OrderByDescending(m => m.VoteCount)
+                        .ToListAsync();
+            List<MovieReponseModal> _reponse = new List<MovieReponseModal>();
+            _reponse = this._mapper.Map<List<TblMovie>, List<MovieReponseModal>>((List<TblMovie>)topMovies);
+            return _reponse;
         }
     }
 }

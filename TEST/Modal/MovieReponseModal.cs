@@ -17,5 +17,11 @@ namespace BE_Movie_Rcm.Modal
 
         [Column(TypeName = "text")]
         public string? Poster { get; set; }
+
+        [Column("Vote_average")]
+        public double? VoteAverage { get; set; }
+
+        [Column("Vote_count")]
+        public int? VoteCount { get; set; }
     }
 }

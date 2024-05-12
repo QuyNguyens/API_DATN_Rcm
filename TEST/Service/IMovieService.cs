@@ -182,5 +182,7 @@ namespace TEST.Service
         Task<UserAdminResponseModal> CountUser();
 
         Task<UserSubAdminResponse> CountUserSubs();
+
+        Task<List<MovieReponseModal>> GetVoteMovieAdm(); 
     }
 }

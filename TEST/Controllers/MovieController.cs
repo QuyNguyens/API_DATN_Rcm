@@ -252,5 +252,12 @@ namespace TEST.Controllers
             var _data = await this._movieService.CountUserSubs();
             return Ok(_data);
         }
+
+        [HttpGet("get-movie-vote-count")]
+        public async Task<IActionResult> GetVoteMovieAdm()
+        {
+            var _data = await this._movieService.GetVoteMovieAdm();
+            return Ok(_data);
+        }
     }
 }
