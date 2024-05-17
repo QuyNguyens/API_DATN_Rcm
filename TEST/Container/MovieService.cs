@@ -553,10 +553,18 @@ namespace TEST.Container
                         .FirstOrDefault();
             if(_data != null )
             {
-                _data.Rating = data.Rating;
-                await this._context.SaveChangesAsync();
-                reponse.ResponseCode = 200;
-                reponse.Result = data.MovieId.ToString();
+                if(_data.Rating == data.Rating)
+                {
+                    reponse.ResponseCode = 202;
+                    reponse.Result = 202.ToString();
+                }
+                else
+                {
+                    _data.Rating = data.Rating;
+                    await this._context.SaveChangesAsync();
+                    reponse.ResponseCode = 200;
+                    reponse.Result = data.MovieId.ToString();
+                }
             }
             else
             {
@@ -820,6 +828,15 @@ namespace TEST.Container
             List<MovieReponseModal> _reponse = new List<MovieReponseModal>();
             _reponse = this._mapper.Map<List<TblMovie>, List<MovieReponseModal>>((List<TblMovie>)topMovies);
             return _reponse;
+        }
+
+        public async Task<List<CountryModal>> GetCountryCodeAdm()
+        {
+            var _data = await this._context.TblCountries.ToListAsync();
+            List<CountryModal> _response = new List<CountryModal>();
+
+            _response = this._mapper.Map<List<TblCountry>, List<CountryModal>>(_data);
+            return _response;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using BE_Movie_Rcm.Modal;
+using BE_Movie_Rcm.Repos.Models;
 using System.Collections.Generic;
 using TEST.Helper;
 using TEST.Modal;
@@ -183,6 +184,8 @@ namespace TEST.Service
 
         Task<UserSubAdminResponse> CountUserSubs();
 
-        Task<List<MovieReponseModal>> GetVoteMovieAdm(); 
+        Task<List<MovieReponseModal>> GetVoteMovieAdm();
+
+        Task<List<CountryModal>> GetCountryCodeAdm();
     }
 }

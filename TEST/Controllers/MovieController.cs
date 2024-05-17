@@ -259,5 +259,12 @@ namespace TEST.Controllers
             var _data = await this._movieService.GetVoteMovieAdm();
             return Ok(_data);
         }
+
+        [HttpGet("get-country-code")]
+        public async Task<IActionResult> GetCountryCodeAdm()
+        {
+            var _data = await this._movieService.GetCountryCodeAdm();
+            return Ok(_data);
+        }
     }
 }
