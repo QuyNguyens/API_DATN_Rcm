@@ -103,7 +103,7 @@ namespace TEST.Controllers
                     TblUser _user = this._mapper.Map<UserModal, TblUser>(userCred);
                     await this.context.TblUsers.AddAsync(_user);
                     await this.context.SaveChangesAsync();
-                    reponse.ResponseCode = 201;
+                    reponse.ResponseCode = userId + 1;
                     reponse.Result = userCred.Email.ToString();
                 }
                 catch (Exception ex)

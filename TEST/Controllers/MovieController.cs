@@ -266,5 +266,12 @@ namespace TEST.Controllers
             var _data = await this._movieService.GetCountryCodeAdm();
             return Ok(_data);
         }
+
+        [HttpPost("create-list-rating")]
+        public async Task<IActionResult> CreateListRating(ListRatingModal data)
+        {
+            var _data = await this._movieService.CreateListRating(data);
+            return Ok(_data);
+        }
     }
 }

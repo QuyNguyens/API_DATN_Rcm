@@ -187,5 +187,7 @@ namespace TEST.Service
         Task<List<MovieReponseModal>> GetVoteMovieAdm();
 
         Task<List<CountryModal>> GetCountryCodeAdm();
+
+        Task<ListRatingModal> CreateListRating(ListRatingModal data);
     }
 }

@@ -838,5 +838,32 @@ namespace TEST.Container
             _response = this._mapper.Map<List<TblCountry>, List<CountryModal>>(_data);
             return _response;
         }
+
+        public async Task<ListRatingModal> CreateListRating(ListRatingModal data)
+        {
+            var _reponse1 = await this._context.TblCountryMovies
+                             .Where(cm => data.countries.Contains(cm.CountryId))
+                            .Select(cm => cm.MovieId)
+                            .Distinct()
+                            .Take(3)
+                            .ToListAsync();
+            var _reponse2 = await this._context.TblGenreMovies
+                             .Where(cm => data.genres.Contains((int)cm.GenreId))
+                            .Select(cm => cm.MovieId)
+                            .Distinct() 
+                            .Take(3)
+                            .ToListAsync();
+            _reponse1.AddRange(_reponse2);
+            foreach(int movieId in _reponse1)
+            {
+                RatingModal rating = new RatingModal() { MovieId = movieId, UserId = data.userId, Rating = 5 };
+                TblRating _rating = this._mapper.Map<RatingModal, TblRating>(rating);
+                await this._context.TblRatings.AddAsync(_rating);
+                await this._context.SaveChangesAsync();
+            }
+            ListRatingModal _reponse = new ListRatingModal();
+            _reponse.genres = _reponse1;
+            return _reponse;
+        }
     }
 }
